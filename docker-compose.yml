@@ -1,0 +1,123 @@
+---
+version: '3'
+services:
+  consul-server1:
+    image: hashicorp/consul
+    container_name: consul-server1
+    restart: always
+    volumes:
+     - ./server-files/server1.json:/consul/config/server.json
+    # - ./certs/:/consul/config/certs/
+    networks:
+      - consul
+    ports:
+      - "8500:8500"
+      - "8600:8600/tcp"
+      - "8600:8600/udp"
+    command: "agent -bootstrap-expect=3"
+
+ 
+  consul-server2:
+    image: hashicorp/consul
+    container_name: consul-server2
+    restart: always
+    volumes:
+     - ./server-files/server2.json:/consul/config/server.json
+    # - ./certs/:/consul/config/certs/
+    networks:
+      - consul
+    command: "agent -bootstrap-expect=3"
+
+ 
+  consul-server3:
+    image: hashicorp/consul
+    container_name: consul-server3
+    restart: always
+    volumes:
+     - ./server-files/server3.json:/consul/config/server.json
+    # - ./certs/:/consul/config/certs/
+    networks:
+      - consul
+    command: "agent -bootstrap-expect=3"
+
+ 
+  consul-client1:
+    image: hashicorp/consul
+    container_name: consul-client1
+    restart: always
+    volumes:
+      - ./client-files/client1.json:/consul/config/client.json
+    # - ./certs/:/consul/config/certs/  
+    ports:
+      - "9005:9005"
+    networks:
+      - consul
+    command: "agent"
+
+  consul-client2:
+    image: hashicorp/consul
+    container_name: consul-client2
+    restart: always
+    volumes:
+      - ./client-files/client2.json:/consul/config/client.json
+    # - ./certs/:/consul/config/certs/  
+    ports:
+      - "9007:9007"
+    networks:
+      - consul
+    command: "agent"
+
+  consul-client3:
+    image: hashicorp/consul
+    container_name: consul-client3
+    restart: always
+    volumes:
+      - ./client-files/client3.json:/consul/config/client.json
+    # - ./certs/:/consul/config/certs/  
+    ports:
+      - "9008:9008"
+    networks:
+      - consul
+    command: "agent"
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+     - POSTGRES_PASSWORD=mypassword
+     - APP_DB_NAME=todo_db
+    volumes:
+     - ./db:/docker-entrypoint-initdb.d/
+     - ./db_data1:/var/lib/postgresql/data
+    ports:
+     - 5437:5432
+    networks:
+      - consul
+   
+
+ 
+  todo_service:
+    build: ./ToDo
+    ports:
+     - 4020:5000
+    networks:
+      - consul
+   
+
+ 
+  efficiency_service:
+    build: ./Efficiency
+    ports:
+      - 4021:5000
+    networks:
+      - consul
+   
+ 
+networks:
+  consul:
+    driver: bridge
+
+volumes:
+  db_data1:
+     
+

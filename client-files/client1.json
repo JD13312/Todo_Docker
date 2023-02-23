@@ -1,0 +1,20 @@
+{
+    "node_name": "consul-client1",
+    "data_dir": "/consul/data",
+    "retry_join":[
+        "consul-server1",
+        "consul-server2",
+        "consul-server3"
+     ],
+     "service": {
+        "id":"db",
+        "name":"db",
+        "port":5432,
+        "connect" : {
+            "sidecar_service":{
+                "port":21000
+            }
+        }
+     }
+     
+}
